@@ -1,7 +1,7 @@
 "use client";
 
 import { Clock, Search, Users } from "lucide-react";
-import Link from "next/link";
+import { LiquidCardLink } from "@/components/ui/liquid-card";
 import { useDeferredValue, useState } from "react";
 import { api, describeError } from "@/lib/api";
 import type { Difficulty, GameCategory, GameSummary } from "@/lib/api/types";
@@ -30,10 +30,7 @@ export function GameCard({ game }: { game: GameSummary }) {
   const meta = KIND_META[game.kind];
   const Icon = meta.icon;
   return (
-    <Link
-      href={`/solo/${game.id}`}
-      className="glass group flex h-full flex-col rounded-[var(--radius-panel)] p-5 transition-[transform,box-shadow,border-color] duration-300 hover:-translate-y-0.5 hover:border-line-strong hover:shadow-[var(--shadow-glow)]"
-    >
+    <LiquidCardLink href={`/solo/${game.id}`} className="group flex h-full flex-col p-5">
       <div className="flex items-start justify-between gap-3">
         <span className={cn("flex size-11 items-center justify-center rounded-2xl border border-line-strong bg-white/[0.04]", meta.accent)} aria-hidden="true">
           <Icon className="size-5" />
@@ -53,7 +50,7 @@ export function GameCard({ game }: { game: GameSummary }) {
         )}
         <span>{game.difficulties.map((d) => DIFFICULTY_LABEL[d]).join(" · ")}</span>
       </div>
-    </Link>
+    </LiquidCardLink>
   );
 }
 
@@ -131,7 +128,7 @@ export function GameLibrary() {
           </p>
           <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {games.map((g) => (
-              <li key={g.id}>
+              <li key={g.id} className="float">
                 <GameCard game={g} />
               </li>
             ))}

@@ -2,6 +2,7 @@ import { Captions, Hash, MonitorUp, RefreshCw, ShieldAlert, Tv } from "lucide-re
 import type { Metadata } from "next";
 import { PageContainer, PageHeader } from "@/components/layout/page-header";
 import { ButtonLink } from "@/components/ui/button";
+import { LiquidCard } from "@/components/ui/liquid-card";
 import { Panel } from "@/components/ui/panel";
 
 export const metadata: Metadata = { title: "Watch Together" };
@@ -32,11 +33,11 @@ export default function WatchPage() {
       />
       <div className="grid gap-4 md:grid-cols-3">
         {POINTS.map((p) => (
-          <Panel key={p.title} className="p-6">
+          <LiquidCard key={p.title} className="float p-6">
             <p.icon className="size-6 text-cyan-300" aria-hidden="true" />
             <h2 className="mt-4 font-display text-lg font-semibold">{p.title}</h2>
             <p className="mt-1.5 text-sm text-fg-muted">{p.body}</p>
-          </Panel>
+          </LiquidCard>
         ))}
       </div>
       <Panel className="mt-6 flex gap-4 p-6">

@@ -3,8 +3,9 @@ import { Inter, Sora } from "next/font/google";
 import Link from "next/link";
 import { Suspense } from "react";
 import { AppProviders } from "@/components/providers/app-providers";
-import { AppHeader, PrismMark } from "@/components/layout/app-header";
+import { AppHeader } from "@/components/layout/app-header";
 import { NetworkBanner } from "@/components/layout/network-banner";
+import { PrismBackground } from "@/components/layout/prism-background";
 import { SETTINGS_BOOTSTRAP_SCRIPT } from "@/lib/settings";
 import "./globals.css";
 
@@ -23,10 +24,9 @@ export const viewport: Viewport = {
 
 function HeaderFallback() {
   return (
-    <header className="sticky top-0 z-40 border-b border-line bg-ink-900/70 backdrop-blur-xl">
-      <div className="mx-auto flex h-16 max-w-7xl items-center gap-2 px-4 sm:px-6">
-        <PrismMark className="size-7" />
-        <span className="font-display text-lg font-semibold tracking-tight">Prism</span>
+    <header className="sticky top-0 z-40 px-3 pt-3 sm:px-6">
+      <div className="mx-auto flex max-w-7xl items-center gap-3">
+        <div className="glass ml-auto h-13 w-28 rounded-2xl" />
       </div>
     </header>
   );
@@ -47,6 +47,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           Skip to content
         </a>
         <AppProviders>
+          <PrismBackground />
           <Suspense fallback={<HeaderFallback />}>
             <AppHeader />
           </Suspense>
@@ -54,7 +55,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           <main id="main" className="flex flex-1 flex-col">
             {children}
           </main>
-          <footer className="border-t border-line py-6 text-center text-xs text-fg-subtle">
+          <footer className="border-t border-line bg-ink-950/30 py-6 backdrop-blur-md text-center text-xs text-fg-subtle">
             <nav aria-label="Footer" className="flex flex-wrap justify-center gap-x-5 gap-y-2 px-4">
               <Link href="/guidelines" className="hover:text-fg">Community guidelines</Link>
               <Link href="/privacy" className="hover:text-fg">Privacy</Link>

@@ -15,7 +15,7 @@ export function CommunityPulse() {
   const { data, error, loading } = useApiQuery("pulse", (signal) => api.community.pulse({ signal }), { refreshMs: 30_000 });
 
   return (
-    <Panel as="aside" aria-labelledby="pulse-title" className="p-5 sm:p-6">
+    <Panel as="aside" aria-labelledby="pulse-title" className="h-full p-5 sm:p-6">
       <div className="flex items-center justify-between gap-3">
         <h2 id="pulse-title" className="flex items-center gap-2 text-sm font-semibold text-fg">
           <span className="relative flex size-2.5" aria-hidden="true">

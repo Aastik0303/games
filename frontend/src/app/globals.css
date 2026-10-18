@@ -79,14 +79,11 @@ html {
 }
 html[data-text-size="large"] { font-size: 112.5%; }
 
+/* The body stays transparent so the fixed <PrismBackground> (z-index -10)
+   paints between the html background and the page. */
 body {
   min-height: 100dvh;
-  background-color: var(--color-ink-900);
-  background-image:
-    radial-gradient(60rem 40rem at 10% -10%, rgb(139 92 246 / 0.16), transparent 60%),
-    radial-gradient(50rem 36rem at 100% 0%, rgb(34 211 238 / 0.09), transparent 60%),
-    radial-gradient(48rem 40rem at 50% 120%, rgb(244 114 182 / 0.08), transparent 60%);
-  background-attachment: fixed;
+  background: transparent;
   color: var(--color-fg);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
@@ -103,20 +100,29 @@ body {
 
 /* ---------- Utilities ---------- */
 
+/* Liquid glass: frosted, saturated backdrop with a specular sheen on the top
+   edge and a soft inner rim, so panels read as thick glass over the light. */
 @utility glass {
-  background: linear-gradient(180deg, rgb(255 255 255 / 0.055), rgb(255 255 255 / 0.025));
+  background:
+    radial-gradient(120% 80% at 0% 0%, rgb(255 255 255 / 0.09), transparent 45%),
+    linear-gradient(180deg, rgb(255 255 255 / 0.06), rgb(255 255 255 / 0.02));
   border: 1px solid var(--color-line);
-  box-shadow: var(--shadow-panel);
-  backdrop-filter: blur(18px) saturate(140%);
-  -webkit-backdrop-filter: blur(18px) saturate(140%);
+  box-shadow:
+    inset 0 1px 0 0 rgb(255 255 255 / 0.14),
+    inset 0 -1px 0 0 rgb(255 255 255 / 0.03),
+    inset 0 0 24px 0 rgb(255 255 255 / 0.025),
+    0 20px 50px -24px rgb(0 0 0 / 0.8);
+  /* Via Tailwind's backdrop utilities: written as a literal
+     backdrop-filter + -webkit-backdrop-filter pair, Lightning CSS keeps only
+     the -webkit- one, which Chromium ignores (no blur at all). */
+  @apply backdrop-blur-[22px] backdrop-saturate-[1.7];
 }
 
 @utility glass-strong {
   background: linear-gradient(180deg, rgb(22 26 40 / 0.92), rgb(14 17 27 / 0.92));
   border: 1px solid var(--color-line-strong);
   box-shadow: var(--shadow-panel);
-  backdrop-filter: blur(24px) saturate(150%);
-  -webkit-backdrop-filter: blur(24px) saturate(150%);
+  @apply backdrop-blur-[24px] backdrop-saturate-150;
 }
 
 /* Gradient hairline border via mask, used on featured cards. */
@@ -154,6 +160,95 @@ body {
 @utility prism-bar {
   background: var(--prism-gradient);
 }
+
+/* Slow weightless bob for floating containers. Uses `transform`, so put it on
+   a wrapper: Tailwind's translate-* utilities use the separate `translate`
+   property and keep working on the element inside. */
+@utility float {
+  animation: float 9s ease-in-out infinite;
+  will-change: transform;
+  &:nth-child(3n + 2) { animation-delay: -3s; animation-duration: 10s; }
+  &:nth-child(3n + 3) { animation-delay: -6s; animation-duration: 11s; }
+}
+
+@keyframes float {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  50% { transform: translate3d(0, -10px, 0); }
+}
+
+/* Fade/slide in as the element scrolls into view (scroll-driven, no JS). */
+@utility reveal {
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      html:not([data-motion="reduce"]) & {
+        animation: reveal linear both;
+        animation-timeline: view();
+        animation-range: entry 0% cover 28%;
+      }
+    }
+  }
+}
+
+/* Transform only: animating opacity would make the wrapper a backdrop root
+   and switch off the glass blur inside it while it animates. */
+@keyframes reveal {
+  from { transform: translateY(64px) scale(0.94); }
+  to { transform: none; }
+}
+
+/* ---------- Crystal background (see components/layout/prism-background.tsx) ---------- */
+
+.prism-bg {
+  position: fixed;
+  inset: 0;
+  z-index: -10;
+  overflow: hidden;
+  pointer-events: none;
+  background: radial-gradient(130% 100% at 50% 40%, #05070c 0%, #030407 60%, #020305 100%);
+}
+
+.prism-bg__canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* ---------- Liquid card (see components/ui/liquid-card.tsx) ---------- */
+
+.liquid-card {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  transform: perspective(900px) rotateX(var(--ry, 0deg)) rotateY(var(--rx, 0deg));
+  transition: transform 500ms var(--ease-prism), box-shadow 300ms ease, border-color 300ms ease;
+}
+/* Hover stays colourless: a white rim and a soft white lift, no tinted glow. */
+.liquid-card:hover {
+  border-color: rgb(255 255 255 / 0.24);
+  box-shadow: 0 0 0 1px rgb(255 255 255 / 0.06), 0 14px 44px -16px rgb(255 255 255 / 0.16), inset 0 1px 0 0 rgb(255 255 255 / 0.2);
+}
+
+/* Pointer spotlight and a sheen that sweeps across on hover. */
+.liquid-card__shine {
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  background:
+    radial-gradient(22rem circle at var(--px, 50%) var(--py, 0%), rgb(255 255 255 / 0.12), transparent 55%),
+    linear-gradient(105deg, transparent 35%, rgb(255 255 255 / 0.06) 45%, rgb(255 255 255 / 0.1) 50%, rgb(255 255 255 / 0.06) 55%, transparent 65%) no-repeat;
+  background-size: 100% 100%, 250% 100%;
+  background-position: 0 0, 120% 0;
+  transition: opacity 300ms ease, background-position 900ms var(--ease-prism);
+}
+.liquid-card:hover .liquid-card__shine { opacity: 1; background-position: 0 0, -20% 0; }
+
+/* High contrast: keep the backdrop calm and flat. */
+@media (prefers-contrast: more) {
+  .prism-bg__canvas { opacity: 0.35; }
+}
+html[data-contrast="high"] .prism-bg__canvas { opacity: 0.35; }
 
 /* High-contrast preference: drop translucency, strengthen lines. */
 @media (prefers-contrast: more) {
