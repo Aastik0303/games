@@ -1,0 +1,39 @@
+[project]
+name = "prism-backend"
+version = "0.1.0"
+description = "Prism API: guest sessions, games, rooms, matchmaking and realtime sync"
+requires-python = ">=3.12"
+# Runtime pins live in requirements.txt (installed by the Dockerfile and CI).
+
+[tool.ruff]
+line-length = 130
+target-version = "py312"
+extend-exclude = ["migrations/versions"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "ASYNC", "S", "SIM", "RUF"]
+ignore = [
+  "S101",   # assert is fine in tests
+  "S311",   # random is only used for puzzle shuffles; secrets.* is used for tokens and codes
+  "RUF001", # puzzle copy uses typographic characters on purpose
+  "RUF002",
+  "RUF003",
+  "B008",   # FastAPI's Depends() in defaults is idiomatic
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["S105", "S106", "SIM117"]
+"app/games/content.py" = ["E501"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+plugins = ["pydantic.mypy"]
+ignore_missing_imports = true
+exclude = ["migrations/", "tests/"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+testpaths = ["tests"]
+filterwarnings = ["ignore::DeprecationWarning"]
